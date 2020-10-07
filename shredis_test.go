@@ -58,7 +58,7 @@ func TestQueue(t *testing.T) {
     redis.Rpush("queue", "3")
     redis.Rpush("queue", "4")
 
-    value, _ := redis.Rpop("queue")
+    value, err := redis.Rpop("queue")
 
     if value != "4" {
         t.Error("rpop failed")
@@ -66,6 +66,12 @@ func TestQueue(t *testing.T) {
     value, _ = redis.Lpop("queue")
     if value != "1" {
         t.Error("lpop failed")
+    }
+    value, _ = redis.Rpop("queue")
+    value, _ = redis.Rpop("queue")
+    value, err = redis.Rpop("queue")
+    if (err == nil) {
+        t.Error("Rpop expected an error, because the queue should be empty")
     }
 }
 
