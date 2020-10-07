@@ -176,22 +176,31 @@ func (this *FakeRedis) Rpop(key string)  (string, error) {
     return element.Value.(string), nil
 }
 
-func (this *FakeRedis) Blpop(key string) (string, error) {
+func (this *FakeRedis) Blpop(key string, timeout int) (string, error) {
     for {
         value, err := this.Lpop(key)
-        if err != nil {
+        if err == nil {
             return value, nil
         }
         time.Sleep(1 * time.Second)
+        timeout--
+        if timeout <= 0 {
+            return "", errors.New("Timeout")
+        }
     }
 }
-func (this *FakeRedis) Brpop(key string) (string, error) {
+
+func (this *FakeRedis) Brpop(key string, timeout int) (string, error) {
     for {
         value, err := this.Rpop(key)
-        if err != nil {
+        if err == nil {
             return value, nil
         }
         time.Sleep(1 * time.Second)
+        timeout--
+        if timeout <= 0 {
+            return "", errors.New("Timeout")
+        }
     }
 }
 

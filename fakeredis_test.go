@@ -69,6 +69,22 @@ func TestQueue(t *testing.T) {
     }
 }
 
+func TestBlpop(t *testing.T) {
+    redis := New()
+    redis.Rpush("queue", "1")
+    
+    _, err := redis.Blpop("queue", 1)
+    if err != nil {
+        t.Errorf("A queue with items returned: %s", err)
+    }
+
+    _, err = redis.Blpop("queue", 1)
+    if err == nil {
+        t.Errorf("An empty queue didn't return a timeout error")
+    }
+
+}
+
 
 func TestConcurrency(t *testing.T) {
     redis := New()
@@ -97,3 +113,4 @@ func TestConcurrency(t *testing.T) {
         t.Error("Concurrency failed")
     }
 }
+
