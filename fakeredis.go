@@ -149,6 +149,10 @@ func (this *FakeRedis) Lpop(key string)  (string, error) {
     }
 
     element := this.qmemory[key].Front()
+    if element == nil {
+        return "", nil
+    }
+
     this.qmemory[key].Remove(element)
 
     return element.Value.(string), nil
@@ -164,6 +168,9 @@ func (this *FakeRedis) Rpop(key string)  (string, error) {
     }
 
     element := this.qmemory[key].Back()
+    if element == nil {
+        return "", nil
+    }
     this.qmemory[key].Remove(element)
 
     return element.Value.(string), nil
