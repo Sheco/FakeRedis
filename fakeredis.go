@@ -145,12 +145,12 @@ func (this *FakeRedis) Lpop(key string)  (string, error) {
 
     // if key does not exists, retur nil
     if _, ok := this.qmemory[key]; !ok {
-        return "", errors.New("Empty list")
+        return "", errors.New("Invalid list")
     }
 
     element := this.qmemory[key].Front()
     if element == nil {
-        return "", nil
+        return "", errors.New("Empty list")
     }
 
     this.qmemory[key].Remove(element)
@@ -164,12 +164,12 @@ func (this *FakeRedis) Rpop(key string)  (string, error) {
 
     // if key does not exists, retur nil
     if _, ok := this.qmemory[key]; !ok {
-        return "", errors.New("Empty list")
+        return "", errors.New("Invalid list")
     }
 
     element := this.qmemory[key].Back()
     if element == nil {
-        return "", nil
+        return "", errors.New("Empty list")
     }
     this.qmemory[key].Remove(element)
 
