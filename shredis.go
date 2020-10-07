@@ -25,17 +25,36 @@ func New() *FakeRedis {
 
     return &this
 }
+func arrayToMap(values []interface{}) (retMap map[string]string) {
+	retMap = make(map[string]string)
+	for i:=0; i< len(values); i+=2 {
+		retMap[values[i].(string)] = values[i+1].(string)
+	}
+	return
+}
 
-func (this *FakeRedis) Hset(key string, field string, value string) {
+func (this *FakeRedis) Hset(key string, values ...interface{}) error {
     this.mutex.Lock()
     defer this.mutex.Unlock()
+
+	var dataMap map[string]string
+	if len(values) > 1 {
+		dataMap = arrayToMap(values)	
+	} else if len(values) == 1 {
+		dataMap = values[0].(map[string]string)
+	} else {
+	    return errors.New("Invalid arguments")
+	}
 
     // if key does not exists, a new key is created
     if _, ok := this.hmemory[key]; !ok {
         this.hmemory[key] = make(map[string]string)
     }
 
-    this.hmemory[key][field] = value
+    for field, value := range dataMap {
+        this.hmemory[key][field] = value
+    }
+    return nil
 }
 
 func (this *FakeRedis) Hincrby(key string, field string, amount int) (string, error) {

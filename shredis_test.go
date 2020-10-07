@@ -14,6 +14,21 @@ func TestHset(t *testing.T) {
     if value != "value" {
         t.Errorf("hset/hget failed")
     }
+
+    redis.Hset("hmset", "field1", "value1", "field2", "value2")
+    value, _ = redis.Hget("hmset", "field1")
+    if value != "value1" {
+        t.Errorf("hset failed with variadic arguments")
+    }
+
+    redis.Hset("hmset2", map[string]string {
+        "FIELD1": "VALUE1",
+        "FIELD2": "VALUE2",
+    })
+    value, _ = redis.Hget("hmset2", "FIELD1")
+    if value != "VALUE1" {
+        t.Errorf("hset failed with a map[string]string")
+    }
 }
 
 func TestHincrby(t *testing.T) {
