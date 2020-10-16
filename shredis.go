@@ -1,4 +1,4 @@
-package fakeredis
+package shredis
 
 import (
     "errors"
@@ -8,7 +8,7 @@ import (
     "sync"
 )
 
-type FakeRedis struct {
+type Shredis struct {
     memory map[string]string
     hmemory map[string]map[string]string
     qmemory map[string]*list.List
@@ -16,8 +16,8 @@ type FakeRedis struct {
 
 }
 
-func New() *FakeRedis {
-    var this FakeRedis
+func New() *Shredis {
+    var this Shredis
 
     this.memory = make(map[string]string)
     this.hmemory = make(map[string]map[string]string)
@@ -33,7 +33,7 @@ func arrayToMap(values []interface{}) (retMap map[string]string) {
 	return
 }
 
-func (this *FakeRedis) Hset(key string, values ...interface{}) error {
+func (this *Shredis) Hset(key string, values ...interface{}) error {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -57,7 +57,7 @@ func (this *FakeRedis) Hset(key string, values ...interface{}) error {
     return nil
 }
 
-func (this *FakeRedis) Hincrby(key string, field string, amount int) (string, error) {
+func (this *Shredis) Hincrby(key string, field string, amount int) (string, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -82,7 +82,7 @@ func (this *FakeRedis) Hincrby(key string, field string, amount int) (string, er
     return this.hmemory[key][field], nil
 }
 
-func (this *FakeRedis) Hget(key string, field string) (string, error) {
+func (this *Shredis) Hget(key string, field string) (string, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -97,7 +97,7 @@ func (this *FakeRedis) Hget(key string, field string) (string, error) {
     return this.hmemory[key][field], nil
 }
 
-func (this *FakeRedis) Hgetall(key string) (map[string]string, error) {
+func (this *Shredis) Hgetall(key string) (map[string]string, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -109,7 +109,7 @@ func (this *FakeRedis) Hgetall(key string) (map[string]string, error) {
     return this.hmemory[key], nil
 }
 
-func (this *FakeRedis) Hexists(key string, field string) (bool, error) {
+func (this *Shredis) Hexists(key string, field string) (bool, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -123,16 +123,16 @@ func (this *FakeRedis) Hexists(key string, field string) (bool, error) {
     return true, nil
 }
 
-func (this *FakeRedis) Set(key string, value string) (error) {
+func (this *Shredis) Set(key string, value string) (error) {
     this.Hset("|s|"+key, "default", value)
     return nil
 }
 
-func (this *FakeRedis) Get(key string) (string, error) {
+func (this *Shredis) Get(key string) (string, error) {
     return this.Hget("|s|"+key, "default")
 }
 
-func (this *FakeRedis) Lpush(key string, value string)  (error) {
+func (this *Shredis) Lpush(key string, value string)  (error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -145,7 +145,7 @@ func (this *FakeRedis) Lpush(key string, value string)  (error) {
     return nil
 }
 
-func (this *FakeRedis) Rpush(key string, value string) (error) {
+func (this *Shredis) Rpush(key string, value string) (error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -158,7 +158,7 @@ func (this *FakeRedis) Rpush(key string, value string) (error) {
     return nil
 }
 
-func (this *FakeRedis) Lpop(key string)  (string, error) {
+func (this *Shredis) Lpop(key string)  (string, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -177,7 +177,7 @@ func (this *FakeRedis) Lpop(key string)  (string, error) {
     return element.Value.(string), nil
 }
 
-func (this *FakeRedis) Rpop(key string)  (string, error) {
+func (this *Shredis) Rpop(key string)  (string, error) {
     this.mutex.Lock()
     defer this.mutex.Unlock()
 
@@ -195,7 +195,7 @@ func (this *FakeRedis) Rpop(key string)  (string, error) {
     return element.Value.(string), nil
 }
 
-func (this *FakeRedis) Blpop(key string, timeout int) (string, error) {
+func (this *Shredis) Blpop(key string, timeout int) (string, error) {
     for {
         value, err := this.Lpop(key)
         if err == nil {
@@ -209,7 +209,7 @@ func (this *FakeRedis) Blpop(key string, timeout int) (string, error) {
     }
 }
 
-func (this *FakeRedis) Brpop(key string, timeout int) (string, error) {
+func (this *Shredis) Brpop(key string, timeout int) (string, error) {
     for {
         value, err := this.Rpop(key)
         if err == nil {

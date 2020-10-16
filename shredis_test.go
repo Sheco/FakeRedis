@@ -1,4 +1,4 @@
-package fakeredis
+package shredis
 
 import (
     "testing"
